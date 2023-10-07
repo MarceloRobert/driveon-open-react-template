@@ -1,6 +1,6 @@
 export const metadata = {
-  title: 'Home - Open PRO',
-  description: 'Page description',
+  title: 'DriveOn - Home',
+  description: 'Página inicial do aplicativo de caronas DriveOn',
 }
 
 import Hero from '@/components/hero'
