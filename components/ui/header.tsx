@@ -25,12 +25,12 @@ export default function Header() {
                   href="/signin"
                   className="font-medium text-green-600 hover:text-gray-200 px-4 py-3 flex items-center transition duration-150 ease-in-out"
                 >
-                  Sign in
+                  Login
                 </Link>
               </li>
               <li>
                 <Link href="/signup" className="btn-sm text-white bg-green-600 hover:bg-green-700 ml-3">
-                  Sign up
+                  Cadastrar
                 </Link>
               </li>
             </ul>
