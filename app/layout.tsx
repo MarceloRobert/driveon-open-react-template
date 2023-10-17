@@ -34,7 +34,8 @@ export default function RootLayout({
         <div className="flex flex-col min-h-screen overflow-hidden">
           <Header />
           {children}
-          {/* <Banner /> */} {/* Banner é o que aparece flutuante no final da página  */}
+          {/* <Banner /> */}
+          {/* Banner é o que aparece flutuante no final da página  */}
         </div>
       </body>
     </html>
