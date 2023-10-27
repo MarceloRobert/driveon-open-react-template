@@ -7,8 +7,11 @@ import Hero from '@/components/hero'
 import Features from '@/components/features'
 import Newsletter from '@/components/newsletter'
 import Zigzag from '@/components/zigzag'
+import TripCalculator from '@/components/trip-calculator'
 import Testimonials from '@/components/testimonials'
-import MapCalculator from '@/components/map-calculator'
+
+const center = { lat: -34.397, lng: 150.644 };
+const zoom = 4;
 
 export default function Home() {
   return (
@@ -16,7 +19,7 @@ export default function Home() {
       <Hero />
       <Features />
       <Zigzag />
-      <MapCalculator />
+      <TripCalculator/>
       <Testimonials />
       <Newsletter />
     </>
