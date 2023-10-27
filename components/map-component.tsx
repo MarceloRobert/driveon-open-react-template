@@ -27,7 +27,7 @@ const CustomMap:React.FC<MapProps> = ({
   );
 
   const { isLoaded } = useLoadScript({
-    googleMapsApiKey: "AIzaSyAMoPT67Uyxt_06O-RpTXWojVO2wuXoMQI" as string,
+    googleMapsApiKey: process.env.MAPS_API_KEY as string,
     libraries: libraries as any,
   });
 
