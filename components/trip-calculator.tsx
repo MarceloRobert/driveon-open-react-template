@@ -1,7 +1,6 @@
 "use client"
-import { useState } from "react";
-import {CustomMap} from "./map-component"
-import { DirectionsService } from "@react-google-maps/api";
+import React, { useState, useEffect, useMemo } from "react";
+import { useLoadScript, GoogleMap, DirectionsRenderer } from '@react-google-maps/api';
 
 export default function TripCalculator() {
   let [map_center_lat, setMapCenterLat] = useState(-22.42556);
@@ -14,58 +13,105 @@ export default function TripCalculator() {
     const city_one = (document.getElementById("cidade-saida") as HTMLInputElement).value;
     const city_two = (document.getElementById("cidade-chegada") as HTMLInputElement).value;
     
-    // console.log(`directions: ${directions}`);
-    // let city_one_latlng;  
-    // let city_two_latlng;
-      
-    // const geocoder = new google.maps.Geocoder();
-    // await geocoder.geocode({
-    //   "address": "Itajubá, MG",
-    //   "region": "BR"
-    // }).then((response) => {
-    //   try {
-    //     if(response.results[0]){
-    //       city_one_latlng = response.results[0].geometry.location;
-    //     }
-    //   } catch (error) {
-    //     console.log(error);
-    //     return;
-    //   }
-    // });
-    // console.log(city_one_latlng);
+    console.log(`directions: ${directions}`);
+    let city_one_latlng;  
+    let city_two_latlng;
+    
+    // Obtém as coordenadas da primeira cidade
+    const geocoder = new google.maps.Geocoder();
+    await geocoder.geocode({
+      "address": city_one,
+      "region": "BR"
+    }).then((response) => {
+      try {
+        if(response.results[0]){
+          city_one_latlng = response.results[0].geometry.location;
+        }
+      } catch (error) {
+        console.log(error);
+        return;
+      }
+    });
+    console.log(`city_one_latlng: ${city_one_latlng}`);
 
-    // await geocoder.geocode({
-    //   "address": "Maria da Fé, MG",
-    //   "region": "BR"
-    // }).then((response) => {
-    //   try {
-    //     if(response.results[0]){
-    //       city_two_latlng = response.results[0].geometry.location;
-    //     }
-    //   } catch (error) {
-    //     console.log(error);
-    //     return;
-    //   }
-    // });
-    // console.log(city_two_latlng);
+    // Obtém as coordenadas da segunda cidade
+    await geocoder.geocode({
+      "address": city_two,
+      "region": "BR"
+    }).then((response) => {
+      try {
+        if(response.results[0]){
+          city_two_latlng = response.results[0].geometry.location;
+        }
+      } catch (error) {
+        console.log(error);
+        return;
+      }
+    });
+    console.log(`city_two_latlng: ${city_two_latlng}`);
 
-    // const directionsService = new google.maps.DirectionsService();
-    // await directionsService.route(
-    //   {
-    //     origin: city_one_latlng!,
-    //     destination: city_two_latlng!,
-    //     travelMode: google.maps.TravelMode.DRIVING
-    //   },
-    //   (result, status) => {
-    //     if (status === google.maps.DirectionsStatus.OK) {
-    //       console.log(result);
-    //       setDirections(result??undefined);
-    //     } else {
-    //       console.error(`error fetching directions ${result}`);
-    //     }
-    //   }
-    // );
-    // console.log(`directions: ${directions}`);
+    let distance:number;
+    // obtém a rota entre as duas coordenadas
+    const directionsService = new google.maps.DirectionsService();
+    await directionsService.route(
+      {
+        origin: city_one_latlng!,
+        destination: city_two_latlng!,
+        travelMode: google.maps.TravelMode.DRIVING
+      },
+      (result, status) => {
+        if (status === google.maps.DirectionsStatus.OK) {
+          console.log(`result: ${result}`);
+          if(result !== null){
+            setDirections(result);
+            distance = result.routes[0].legs[0].distance!.value;
+          }
+        } else {
+          console.error(`error fetching directions ${result}`);
+        }
+      }
+    );
+    console.log(`directions: ${directions}`);
+
+    // Função para calcular o preço
+    // distance é retornada em metros
+    // cálculo é feito com: distância (km) / eficiência média (km/L) * preço médio da gasolina (R$/L) * taxa
+    const tripTotalCost = (distance! / 1000) / 12 * 5.5 * 1.1;
+
+    // Exibe o custo da rota
+    const tripCostNotice = document.querySelector("#trip-cost-notice");
+    tripCostNotice?.removeAttribute("hidden");
+    const tripCostValue = document.querySelector("#trip-cost-value");
+    if(distance! !== undefined && tripCostValue !== null){
+      tripCostValue.innerHTML = tripTotalCost.toFixed(2).toString();
+    }
+
+  }
+
+  /////////////////////////////////////////// 
+
+  const libraries = useMemo(() => ['places'], []);
+  const mapCenter = { lat: map_center_lat, lng: map_center_lng };
+
+  const mapOptions = useMemo<google.maps.MapOptions>(
+    () => ({
+      disableDefaultUI: false,
+      clickableIcons: true,
+      scrollwheel: false,
+      streetViewControl: false,
+      fullscreenControl: false,
+      mapTypeControl: false,
+    }),
+    []
+  );
+
+  const { isLoaded } = useLoadScript({
+    googleMapsApiKey: process.env.NEXT_PUBLIC_MAPS_API_KEY as string,
+    libraries: libraries as any,
+  });
+
+  if (!isLoaded) {
+    return <p>Loading...</p>;
   }
 
   return (
@@ -84,11 +130,15 @@ export default function TripCalculator() {
 
             {/* Mapa */}
             <div className="w-3/4 md:w-1/2 h-1/1 mb-5" id="map-renderer">
-              <CustomMap
-                center_lat={map_center_lat}
-                center_lng={map_center_lng}
-                directions={directions}
-              />
+              <GoogleMap
+                options={mapOptions}
+                zoom={10}
+                center={mapCenter}
+                mapTypeId={google.maps.MapTypeId.ROADMAP}
+                mapContainerStyle={{ width: '100%', height: '100%', borderRadius: "5px" }}
+                onLoad={() => console.log('Map Component Loaded.')}>
+              {directions && <DirectionsRenderer directions={directions} />}
+              </GoogleMap>
             </div>
 
             {/* Formulário para cálculo */}
