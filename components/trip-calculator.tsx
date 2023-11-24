@@ -1,19 +1,40 @@
 "use client"
-import React, { useState, useEffect, useMemo } from "react";
-import { useLoadScript, GoogleMap, DirectionsRenderer } from '@react-google-maps/api';
+import React, { useState, useRef, useMemo } from "react";
+import { useLoadScript, GoogleMap, DirectionsRenderer, StandaloneSearchBox } from '@react-google-maps/api';
 
 export default function TripCalculator() {
   let [map_center_lat, setMapCenterLat] = useState(-22.42556);
   let [map_center_lng, setMapCenterLng] = useState(-45.45278);
   let [directions, setDirections] = useState<google.maps.DirectionsResult>();
 
+  const libraries = useMemo(() => ['places'], []);
+  const mapCenter = { lat: map_center_lat, lng: map_center_lng };
+  const inputRef = useRef<google.maps.places.SearchBox>();
+
+  const mapOptions = useMemo<google.maps.MapOptions>(
+    () => ({
+      disableDefaultUI: false,
+      clickableIcons: true,
+      scrollwheel: false,
+      streetViewControl: false,
+      fullscreenControl: false,
+      mapTypeControl: false,
+    }),
+    []
+  );
+
+  const { isLoaded } = useLoadScript({
+    googleMapsApiKey: process.env.NEXT_PUBLIC_MAPS_API_KEY as string,
+    libraries: libraries as any,
+  });
+
   async function submitForm(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    // get the values of the form
+    // Pega os valores do formulário
     const city_one = (document.getElementById("cidade-saida") as HTMLInputElement).value;
     const city_two = (document.getElementById("cidade-chegada") as HTMLInputElement).value;
     
-    console.log(`directions: ${directions}`);
+    // console.log(`directions: ${directions}`);
     let city_one_latlng;  
     let city_two_latlng;
     
@@ -32,7 +53,7 @@ export default function TripCalculator() {
         return;
       }
     });
-    console.log(`city_one_latlng: ${city_one_latlng}`);
+    // console.log(`city_one_latlng: ${city_one_latlng}`);
 
     // Obtém as coordenadas da segunda cidade
     await geocoder.geocode({
@@ -48,7 +69,7 @@ export default function TripCalculator() {
         return;
       }
     });
-    console.log(`city_two_latlng: ${city_two_latlng}`);
+    // console.log(`city_two_latlng: ${city_two_latlng}`);
 
     let distance:number;
     // obtém a rota entre as duas coordenadas
@@ -71,7 +92,7 @@ export default function TripCalculator() {
         }
       }
     );
-    console.log(`directions: ${directions}`);
+    // console.log(`directions: ${directions}`);
 
     // Função para calcular o preço
     // distance é retornada em metros
@@ -88,27 +109,15 @@ export default function TripCalculator() {
 
   }
 
+  const handlePlaceChanged = () => {
+    const [ place ] = inputRef.current!.getPlaces()??[];
+    // if(place) { 
+    //     console.log(place.formatted_address)
+    //     console.log(place.geometry?.location?.lat())
+    //     console.log(place.geometry?.location?.lng())
+    // } 
+  }
   /////////////////////////////////////////// 
-
-  const libraries = useMemo(() => ['places'], []);
-  const mapCenter = { lat: map_center_lat, lng: map_center_lng };
-
-  const mapOptions = useMemo<google.maps.MapOptions>(
-    () => ({
-      disableDefaultUI: false,
-      clickableIcons: true,
-      scrollwheel: false,
-      streetViewControl: false,
-      fullscreenControl: false,
-      mapTypeControl: false,
-    }),
-    []
-  );
-
-  const { isLoaded } = useLoadScript({
-    googleMapsApiKey: process.env.NEXT_PUBLIC_MAPS_API_KEY as string,
-    libraries: libraries as any,
-  });
 
   if (!isLoaded) {
     return <p>Loading...</p>;
@@ -150,12 +159,25 @@ export default function TripCalculator() {
                     <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="cidade-saida">
                       Saída
                     </label>
-                    <input
-                      className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-green-500"
-                      id="cidade-saida"
-                      type="text"
-                      placeholder = "Cidade de saída"
-                    />
+                    
+                    {/* Caixa com sugestões de lugares. A bbox é um guia de onde as sugestões vêm, mas elas não são contidas nesse guia. A bbox passada aqui é um centro do Brasil */}
+                    <StandaloneSearchBox
+                      onLoad={ref => inputRef.current = ref}
+                      onPlacesChanged={handlePlaceChanged}
+                      bounds={{
+                        north: 0,
+                        south: -23.293940,
+                        east: -37.951173,
+                        west: -65.021486,
+                      }}
+                    >
+                      <input
+                          type="text"
+                          placeholder="Cidade de saída"
+                          id="cidade-saida"
+                          className="form-control shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-green-500"
+                      />
+                    </StandaloneSearchBox>
                 </div>
 
                 {/* Cidade chegada */}
@@ -163,12 +185,25 @@ export default function TripCalculator() {
                     <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="cidade-chegada">
                       Chegada
                     </label>
-                    <input
-                      className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:border-green-500"
-                      id = "cidade-chegada"
-                      type = "text"
-                      placeholder = "Cidade de chegada"
-                    />
+                    
+                    <StandaloneSearchBox
+                      onLoad={ref => inputRef.current = ref}
+                      onPlacesChanged={handlePlaceChanged}
+                      bounds={{
+                        north: 0,
+                        south: -23.293940,
+                        east: -37.951173,
+                        west: -65.021486,
+                      }}
+                    >
+                      <input
+                          type="text"
+                          placeholder="Cidade de chegada"
+                          id="cidade-chegada"
+                          className="form-control shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-green-500"
+                      />
+                    </StandaloneSearchBox>
+                   
                 </div>
 
                 {/* Botão para calcular */}
@@ -184,8 +219,10 @@ export default function TripCalculator() {
 
               {/* Exibição do preço */}
               <div className=" items-center my-5" hidden id="trip-cost-notice">
-                <h3 className="h3 text-center">Preço da viagem:</h3>
-                <p className="text-center">Apenas R$ <span id="trip-cost-value">0.00</span></p>
+                <h3 className="text-2xl font-semibold text-center">Preço da viagem:</h3>
+                <p className="text-center text-xl">
+                  Apenas <span className="font-bold underline">R$ </span>
+                  <span id="trip-cost-value" className="font-bold underline">0.00</span></p>
               </div>
             </div>
           </div>
