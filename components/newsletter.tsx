@@ -5,7 +5,6 @@ export default function Newsletter() {
 
         {/* CTA box */}
         <div className="relative bg-green-600 py-10 px-8 md:py-16 md:px-12" data-aos="fade-up">
-
           {/* Background illustration */}
           <div className="absolute right-0 top-0 -ml-40 pointer-events-none" aria-hidden="true">
             <svg width="238" height="110" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -20,7 +19,6 @@ export default function Newsletter() {
           </div>
 
           <div className="relative flex flex-col lg:flex-row justify-evenly items-center">
-
             {/* CTA content */}
             <div className="mb-6 lg:mb-0 text-center">
               <h3 className="h3 text-white mb-2">Não fique parado</h3>
