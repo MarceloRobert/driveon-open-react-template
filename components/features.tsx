@@ -2,16 +2,16 @@ export default function Features() {
   return (
     <section>
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
-        <div className="py-12 md:py-20">
+        <div className="py-12 md:pb-20 md:pt-24">
 
           {/* Section header */}
-          <div className="max-w-3xl mx-auto text-center pb-12 md:pb-20">
+          <div className="max-w-4xl mx-auto text-center pb-12 md:pb-20">
             <h2 className="h2 mb-4">Segurança. Economia. Conforto.</h2>
             <p className="text-xl text-gray-400">Em nosso aplicativo de caronas, não apenas oferecemos viagens econômicas aos nossos passageiros, mas também proporcionamos aos motoristas uma maneira confiável e segura de gerar renda. Utilizando tecnologia avançada, criamos uma experiência única para nossos usuários, oferecendo conveniência, economia e segurança incomparáveis.</p>
           </div>
 
           {/* Items */}
-          <div className="max-w-sm mx-auto grid gap-8 md:grid-cols-2 lg:grid-cols-3 lg:gap-16 items-start md:max-w-2xl lg:max-w-none" data-aos-id-blocks>
+          <div className="max-w-sm mx-auto grid gap-8 md:grid-cols-2 lg:grid-cols-3 lg:gap-8 items-start md:max-w-2xl lg:max-w-none" data-aos-id-blocks>
 
             {/* 1st item */}
             <div className="relative flex flex-col items-center" data-aos="fade-up" data-aos-anchor="[data-aos-id-blocks]">
@@ -46,7 +46,7 @@ export default function Features() {
                 </g>
               </svg>
               <h4 className="h4 mb-2">Não se preocupe</h4>
-              <p className="text-lg text-gray-400 text-center">Com funcionalidades de segurança, o status da viagem pode ser compartilhado com contatos de segurança, além da avaliação de motoristas e passageiros.</p>
+              <p className="text-lg text-gray-400 text-center">O status da viagem pode ser compartilhado com contatos de segurança, além da avaliação de motoristas e passageiros.</p>
             </div>
 
             {/* 4th item */}

@@ -97,7 +97,7 @@ export default function TripCalculator() {
     // Função para calcular o preço
     // distance é retornada em metros
     // cálculo é feito com: distância (km) / eficiência média (km/L) * preço médio da gasolina (R$/L) * taxa
-    const tripTotalCost = (distance! / 1000) / 12 * 5.5 * 1.1;
+    const tripTotalCost = (distance! / 1000) / 12 * 4.9 * 1.05;
 
     // Exibe o custo da rota
     const tripCostNotice = document.querySelector("#trip-cost-notice");

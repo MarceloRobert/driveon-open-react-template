@@ -23,7 +23,7 @@ export default function Hero() {
         </div>
 
         {/* Hero content */}
-        <div className="relative pt-32 pb-10 md:pt-40 md:pb-16">
+        <div className="relative pt-32 pb-10 md:pt-40 md:pb-32">
 
           <div className="relative flex justify-center items-center" data-aos="fade-up" data-aos-delay="200">
             <Image src={AppLogo} width={300} height={150} alt={"Logo do app"} />
